@@ -1,0 +1,45 @@
+steps:
+  - id: 'Building container image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'us-central1-docker.pkg.dev/$PROJECT_ID/phone-system/$_SERVICE_NAME:$SHORT_SHA',
+        '.',
+      ]
+    env:
+      - 'DOCKER_BUILDKIT=1'
+
+  - id: 'Registering container...'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'us-central1-docker.pkg.dev/$PROJECT_ID/phone-system/$_SERVICE_NAME:$SHORT_SHA',
+      ]
+
+  - id: 'Deploy container image to Cloud Run'
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      [
+        'run',
+        'deploy',
+        '$_SERVICE_NAME',
+        '--image',
+        'us-central1-docker.pkg.dev/$PROJECT_ID/phone-system/$_SERVICE_NAME:$SHORT_SHA',
+        '--region',
+        'us-central1',
+        '--platform',
+        'managed',
+        '--allow-unauthenticated',
+        '--timeout=360',
+        '--set-env-vars',
+        'VAPI_API_TOKEN=$_VAPI_API_TOKEN,TEL_TEST_ID=$_TEL_TEST_ID',
+        '--set-secrets',
+        'VAPI_API_TOKEN=$_VAPI_API_TOKEN,TEL_TEST_ID=$_TEL_TEST_ID',
+      ]
+
+options:
+  logging: 'CLOUD_LOGGING_ONLY'
