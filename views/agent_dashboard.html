@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Opsmind – Dashboard</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+</head>
+
+<body class="app-body">
+  <div class="app-container">
+    <div class="panel panel-wide">
+
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title" id="agentTitle">Agent Dashboard</h2>
+          <p class="panel-desc" id="agentSubtitle">Manage your assistant actions</p>
+        </div>
+
+        <a class="ghost-btn" href="/views/home.html">← Back</a>
+      </div>
+
+      <div class="actions-grid">
+        <button class="btn-primary" onclick="testAssistant()">Test Assistant</button>
+        <button class="btn-danger" onclick="deleteAssistant()">Delete Assistant</button>
+        <button class="btn-secondary" disabled>Update Assistant</button>
+      </div>
+
+      <div class="info-box">
+        <p class="hint-text">
+          Tip: You can test the assistant call. The assistant will call to your personal phone.
+        </p>
+      </div>
+
+      <div class="calls-panel">
+        <div class="panel-head" style="margin-top:16px;">
+          <div>
+            <h3 class="panel-title" style="font-size:16px;">Calls</h3>
+            <p class="panel-desc">Latest calls for this assistant</p>
+          </div>
+          <button class="ghost-btn" type="button" onclick="loadCalls()">Refresh</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Call ID</th>
+                <th>Assistant Phone Number</th>
+                <th>Customer Phone Number</th>
+                <th>Type</th>
+                <th>Ended Reason</th>
+                <th>Success Evaluation</th>
+                <th>Score</th>
+                <th>Start Time</th>
+                <th>Duration</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody id="callsTbody">
+              <tr>
+                <td colspan="10" class="table-empty">Loading calls…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  
+    <div class="panel panel-wide" style="margin-top: 18px;">
+
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Analytics</h2>
+          <p class="panel-desc">Trends for this assistant</p>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-head">
+            <h3 class="chart-title">Total Call Minutes</h3>
+            <p class="chart-sub">Minutes per day</p>
+          </div>
+          <div class="chart-box">
+            <canvas id="chartMinutes"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <h3 class="chart-title">Number of Calls</h3>
+            <p class="chart-sub">Calls per day</p>
+          </div>
+          <div class="chart-box">
+            <canvas id="chartCalls"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <h3 class="chart-title">Total Spent</h3>
+            <p class="chart-sub">USD per day</p>
+          </div>
+          <div class="chart-box">
+            <canvas id="chartSpent"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <h3 class="chart-title">Average Cost per Call</h3>
+            <p class="chart-sub">USD per call (per day)</p>
+          </div>
+          <div class="chart-box">
+            <canvas id="chartAvgCost"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/agent_dashboard.js"></script>
+</body>
+</html>

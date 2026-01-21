@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Opsmind AI - Login</title>
+    <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body class="auth-body">
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 id="title" class="auth-title">Sign in to your account</h2>
+
+            <form id="authForm" class="auth-form">
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder="Email"
+                    required
+                    class="auth-input"
+                >
+
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="Password"
+                    required
+                    class="auth-input"
+                >
+
+                <input
+                    type="tel"
+                    name="tel"
+                    id="tel"
+                    placeholder="Telephone"
+                    hidden
+                    class="auth-input"
+                >
+
+                <button type="submit" id="btnText" class="auth-button">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-toggle">
+                <span id="toggleText" onclick="toggleMode()">
+                    Don't have an account? <strong>Create an account</strong>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Opsmind – Agent Prompts</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+</head>
+
+<body class="app-body">
+
+  <div class="app-container">
+    <div class="panel panel-wide">
+
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Customize your agent</h2>
+          <p class="panel-desc">Review and edit the prompts before creating your agent.</p>
+        </div>
+      </div>
+
+      <form id="createAgentForm" class="form-stack" enctype="multipart/form-data">
+
+        <label class="field-label" for="system_prompt">System Prompt</label>
+        <textarea class="field-textarea"
+                  name="system_prompt"
+                  id="system_prompt"
+                  rows="7"
+                  required
+                  placeholder="You are an assistant..."
+        ></textarea>
+
+        <label class="field-label" for="first_message">First Message</label>
+        <textarea class="field-textarea"
+                  name="first_message"
+                  id="first_message"
+                  rows="4"
+                  required
+                  placeholder="Hi! How can I help you today?"
+        ></textarea>
+
+        <div class="upload-box">
+          <label class="field-label" for="file">Upload PDF Knowledge (optional)</label>
+          <input class="field-file" type="file" name="files" id="files" multiple/>
+          <p class="hint-text">Upload a file to add knowledge to your agent.</p>
+        </div>
+
+        <input type="hidden" name="agent_name" id="agent_name" />
+        <input type="hidden" name="use_case" id="use_case" />
+        <input type="hidden" name="user_id" id="user_id" />
+
+        <button class="auth-button" type="submit">Create Agent</button>
+      </form>
+
+    </div>
+  </div>
+
+  <script src="../js/agent_prompts.js"></script>
+</body>
+</html>

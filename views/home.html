@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Opsmind – My Agents</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+</head>
+
+<body class="app-body">
+
+  <div class="app-container">
+
+    <header class="page-header">
+      <h1 class="page-title">Dashboard</h1>
+      <button class="ghost-btn" onclick="logout()">Log out</button>
+    </header>
+    
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">My Telephone numbers</h2>
+        <button class="add-btn" onclick="createPhone()">＋</button>
+      </div>
+
+      <div id="phoneList" class="phone-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">My Agents</h2>
+        <button class="add-btn" onclick="toggleCreate()">＋</button>
+      </div>
+
+      <div id="agentsList" class="agents-grid"></div>
+
+      <div id="useCasePanel" class="usecase-panel hidden">
+        <h3 class="panel-subtitle">Select a Use Case</h3>
+        
+      <div class="usecase-grid">
+
+        <label class="usecase-card">
+          <input type="radio" name="use_case" value="property_management" />
+          <span>🏢</span>
+          <p>Property Management</p>
+        </label>
+
+        <label class="usecase-card">
+          <input type="radio" name="use_case" value="personal_assistant" />
+          <span>🤖</span>
+          <p>Personal Assistant</p>
+        </label>
+
+        <label class="usecase-card">
+          <input type="radio" name="use_case" value="learning_companion" />
+          <span>🎓</span>
+          <p>Learning Companion</p>
+        </label>
+
+        <label class="usecase-card">
+          <input type="radio" name="use_case" value="creative_helper" />
+          <span>✨</span>
+          <p>Creative Helper</p>
+        </label>
+
+      </div>
+
+        <button class="next-btn" onclick="goToCreate()">Next</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="../js/home.js"></script>
+</body>
+</html>

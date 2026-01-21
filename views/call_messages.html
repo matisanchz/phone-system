@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Opsmind – Call Messages</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+</head>
+
+<body class="app-body">
+
+  <div class="app-container">
+    <div class="panel panel-wide">
+
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title" id="callTitle">Call Details</h2>
+          <p class="panel-desc" id="callSubtitle">Messages & summary</p>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="ghost-btn" type="button" onclick="refreshCall()">Refresh</button>
+          <a class="ghost-btn" href="/views/agent_dashboard.html">← Back</a>
+        </div>
+      </div>
+      
+      <div class="stats-grid" id="statsGrid">
+      </div>
+
+      <div class="links-row" id="linksRow" style="display:none;">
+        <a id="recordingLink" class="link-pill" target="_blank" rel="noreferrer">Open recording</a>
+        <a id="logLink" class="link-pill" target="_blank" rel="noreferrer">Open logs</a>
+      </div>
+
+      <div class="messages-panel">
+        <div class="messages-head">
+          <h3 class="messages-title">Messages</h3>
+          <span class="hint-text" id="messagesHint">Loading…</span>
+        </div>
+        <div id="messagesList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/call_messages.js"></script>
+</body>
+</html>
