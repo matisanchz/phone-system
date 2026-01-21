@@ -27,7 +27,7 @@ document.getElementById('authForm').onsubmit = async (e) => {
                 localStorage.setItem('user_id', data.user.id);
                 localStorage.setItem('user_email', data.user.email);
                 localStorage.setItem('user_tel', data.user.telephone);
-                window.location.href = '/views/home.html';
+                window.location.href = '/docs/home.html';
             } else {
                 alert("Account created. You can now log in.");
                 toggleMode();

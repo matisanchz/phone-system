@@ -63,7 +63,7 @@ document.getElementById("createAgentForm").addEventListener("submit", async (e) 
       return;
     }
 
-    window.location.href = "/views/home.html";
+    window.location.href = "/docs/home.html";
 
   } catch (err) {
     console.error(err);
