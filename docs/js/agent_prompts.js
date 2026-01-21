@@ -51,7 +51,7 @@ document.getElementById("createAgentForm").addEventListener("submit", async (e) 
   }
 
   try {
-    const res = await fetch("${window.OPSMIND_API_URL}/api/create-agent", {
+    const res = await fetch(`${window.OPSMIND_API_URL}/api/create-agent`, {
       method: "POST",
       body: formData
     });
