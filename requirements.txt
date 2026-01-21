@@ -74,3 +74,4 @@ websockets==16.0
 Werkzeug==3.1.5
 xxhash==3.6.0
 zstandard==0.25.0
+psycopg[binary]
