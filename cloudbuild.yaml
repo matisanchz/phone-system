@@ -36,9 +36,9 @@ steps:
         '--allow-unauthenticated',
         '--timeout=360',
         '--set-env-vars',
-        'VAPI_API_TOKEN=$_VAPI_API_TOKEN,TEL_TEST_ID=$_TEL_TEST_ID',
+        'VAPI_API_TOKEN=$_VAPI_API_TOKEN,TEL_TEST_ID=$_TEL_TEST_ID,DATABASE_URL=$_DATABASE_URL,',
         '--set-secrets',
-        'VAPI_API_TOKEN=$_VAPI_API_TOKEN,TEL_TEST_ID=$_TEL_TEST_ID',
+        'VAPI_API_TOKEN=$_VAPI_API_TOKEN,TEL_TEST_ID=$_TEL_TEST_ID,DATABASE_URL=$_DATABASE_URL,',
       ]
 
 options:

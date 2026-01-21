@@ -6,9 +6,10 @@ from typing import List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 import requests
 from dotenv import load_dotenv
-from app.database import UserAgent, UserPhone, get_db
+from app.database import get_db
 from app.prompts.property_manager_prompt import property_manager_system_prompt, property_manager_first_message
 from app.schemas.create_agent_request import CreateAgentRequest
+from sqlalchemy import text
 
 load_dotenv()
 
@@ -182,13 +183,17 @@ async def create_agent(
         )
         response.raise_for_status()
 
-        user_agent = UserAgent(
-            user_id=user_id, 
-            agent_id=response.json()["id"]
+        result = db.execute(
+            text("""
+                INSERT INTO user_agent (user_id, agent_id)
+                VALUES (:user_id, :agent_id)
+                RETURNING id, user_id, agent_id
+            """),
+            {"user_id": user_id, "agent_id": response.json()["id"]}
         )
-        db.add(user_agent)
+
+        row = result.mappings().one()
         db.commit()
-        db.refresh(user_agent)
     except Exception as e:
         print(f"Exception: {e}")
 
@@ -199,18 +204,18 @@ async def get_agents(
     user_id: str = Query(...),
     db: requests.Session = Depends(get_db)
 ):
-    agents = db.query(UserAgent).filter(UserAgent.user_id == user_id).all()
+    rows = db.execute(
+        text("SELECT agent_id FROM user_agent WHERE user_id = :user_id"),
+        {"user_id": user_id},
+    ).fetchall()
 
     results = []
 
-    for x in agents:
+    for (agent_id,) in rows:
         try:
-            agent = requests.get(
-                f"{VAPI_ASSISTANT_URL}/{x.agent_id}", 
-                headers=headers
-            )
-
-            results.append(agent.json())
+            resp = requests.get(f"{VAPI_ASSISTANT_URL}/{agent_id}", headers=headers, timeout=15)
+            resp.raise_for_status()
+            results.append(resp.json())
 
         except Exception as e:
             print(f"Exception: {e}")
@@ -219,24 +224,22 @@ async def get_agents(
 
 @router.get("/phones")
 async def get_phones(
-    user_id: str = Query(...),
-    db: requests.Session = Depends(get_db)
+    user_id: int = Query(...),
+    db: requests.Session = Depends(get_db),
 ):
-    phones = db.query(UserPhone).filter(UserPhone.user_id == user_id).all()
+    rows = db.execute(
+        text("SELECT phone_id FROM user_phone WHERE user_id = :user_id"),
+        {"user_id": user_id},
+    ).fetchall()
 
     results = []
-
-    for x in phones:
+    for (phone_id,) in rows:
         try:
-            phone = requests.get(
-                f"{VAPI_PHONE_URL}/{x.phone_id}", 
-                headers=headers
-            )
-
-            results.append(phone.json())
-
+            resp = requests.get(f"{VAPI_PHONE_URL}/{phone_id}", headers=headers, timeout=15)
+            resp.raise_for_status()
+            results.append(resp.json())
         except Exception as e:
-            print(f"Exception: {e}")
+            print(f"Exception fetching phone {phone_id}: {e}")
 
     return results
 
@@ -352,29 +355,29 @@ async def delete_assistant(
     id: str,
     db: requests.Session = Depends(get_db)
 ):
-    
-    headers = {
-        "Authorization": f"Bearer {VAPI_API_TOKEN}"
-    }
+    headers = {"Authorization": f"Bearer {VAPI_API_TOKEN}"}
 
     try:
-        response = requests.delete(f"{VAPI_ASSISTANT_URL}/{id}", headers=headers)
+        response = requests.delete(f"{VAPI_ASSISTANT_URL}/{id}", headers=headers, timeout=15)
         response.raise_for_status()
     except Exception as e:
-        return {"error": str(e), "details": response.text if 'response' in locals() else None}
+        return {
+            "error": str(e),
+            "details": response.text if "response" in locals() else None
+        }
     
     try:
-        deleted_rows = (
-            db.query(UserAgent)
-            .filter(UserAgent.agent_id == id)
-            .delete(synchronize_session=False)
+        result = db.execute(
+            text("DELETE FROM user_agent WHERE agent_id = :agent_id"),
+            {"agent_id": id}
         )
-
         db.commit()
+
+        return {"ok": True, "deleted_rows": result.rowcount}
+
     except Exception as e:
         db.rollback()
         raise HTTPException(
             status_code=500,
             detail=f"Error deleting assistant from DB: {str(e)}"
         )
-    
