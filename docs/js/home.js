@@ -31,7 +31,7 @@ async function loadPhones() {
   const userId = localStorage.getItem("user_id");
 
   if (!userId) {
-    window.location.href = "/docs/login.html";
+    window.location.href = "/phone-system";
     return;
   }
 
@@ -61,7 +61,7 @@ async function loadPhones() {
       btn.onclick = () => {
         localStorage.setItem("phone_id", phone.id);
         localStorage.setItem("phone_number", phone.number);
-        window.location.href = "/docs/phone_logs.html";
+        window.location.href = "/phone-system/phone_logs.html";
       };
 
       container.appendChild(btn);
@@ -76,7 +76,7 @@ async function loadAgents() {
   const userId = localStorage.getItem("user_id");
 
   if (!userId) {
-    window.location.href = "/docs/login.html";
+    window.location.href = "/phone-system/";
     return;
   }
 
@@ -106,7 +106,7 @@ async function loadAgents() {
       btn.onclick = () => {
         localStorage.setItem("assistant_id", agent.id);
         localStorage.setItem("assistant_name", agent.name);
-        window.location.href = "/docs/agent_dashboard.html";
+        window.location.href = "/phone-system/agent_dashboard.html";
       };
 
       container.appendChild(btn);
@@ -119,5 +119,5 @@ async function loadAgents() {
 
 function openAgent(agentId) {
   localStorage.setItem("agentId", agentId);
-  window.location.href = "/docs/agent_detail.html";
+  window.location.href = "/phone-system/agent_detail.html";
 }

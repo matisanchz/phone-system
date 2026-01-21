@@ -129,7 +129,7 @@ async function loadCalls() {
         localStorage.setItem("call_id", call.id);
         localStorage.setItem("assistant_id", call.assistantId);
 
-        window.location.href = "/docs/call_messages.html";
+        window.location.href = "/phone-system/call_messages.html";
       });
 
       tbody.appendChild(tr);
