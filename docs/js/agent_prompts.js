@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     const systemRes = await fetch(
-      `http://localhost:8000/api/system_prompt?use_case=${useCase}&agent_name=${agentName}`
+      `${window.OPSMIND_API_URL}/api/system_prompt?use_case=${useCase}&agent_name=${agentName}`
     );
     const systemData = await systemRes.json();
 
     document.getElementById('system_prompt').value = systemData;
 
     const firstMsgRes = await fetch(
-      `http://localhost:8000/api/first_message?use_case=${useCase}&agent_name=${agentName}`
+      `${window.OPSMIND_API_URL}/api/first_message?use_case=${useCase}&agent_name=${agentName}`
     );
     const firstMsgData = await firstMsgRes.json();
     document.getElementById('first_message').value = firstMsgData;
@@ -51,7 +51,7 @@ document.getElementById("createAgentForm").addEventListener("submit", async (e) 
   }
 
   try {
-    const res = await fetch("http://localhost:8000/api/create-agent", {
+    const res = await fetch("${window.OPSMIND_API_URL}/api/create-agent", {
       method: "POST",
       body: formData
     });

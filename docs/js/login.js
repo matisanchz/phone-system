@@ -15,7 +15,7 @@ document.getElementById('authForm').onsubmit = async (e) => {
     const endpoint = isLogin ? '/auth/login' : '/auth/signup';
 
     try {
-        const response = await fetch(`http://localhost:8000${endpoint}`, {
+        const response = await fetch(`${window.OPSMIND_API_URL}${endpoint}`, {
             method: 'POST',
             body: formData
         });

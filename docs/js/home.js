@@ -37,7 +37,7 @@ async function loadPhones() {
 
   try {
     const res = await fetch(
-      `http://localhost:8000/api/phones?user_id=${userId}`
+      `${window.OPSMIND_API_URL}/api/phones?user_id=${userId}`
     );
 
     const phones = await res.json();
@@ -82,7 +82,7 @@ async function loadAgents() {
 
   try {
     const res = await fetch(
-      `http://localhost:8000/api/agents?user_id=${userId}`
+      `${window.OPSMIND_API_URL}/api/agents?user_id=${userId}`
     );
 
     const agents = await res.json();

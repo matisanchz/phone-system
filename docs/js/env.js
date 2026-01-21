@@ -1,0 +1,1 @@
+window.OPSMIND_API_URL = 'https://phone-system-597965137322.europe-west1.run.app';

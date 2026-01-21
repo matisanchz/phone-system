@@ -3,7 +3,7 @@ const customerNumber = encodeURIComponent(localStorage.getItem("user_tel"));
 
 async function testAssistant() {
     const systemRes = await fetch(
-      `http://localhost:8000/api/test-call?customer_number=${customerNumber}&assistant_id=${agentId}`,
+      `${window.OPSMIND_API_URL}/api/test-call?customer_number=${customerNumber}&assistant_id=${agentId}`,
       {
         method: "POST",
         headers: {
@@ -19,7 +19,7 @@ async function testAssistant() {
 
 async function deleteAssistant() {
     const systemRes = await fetch(
-      `http://localhost:8000/api/delete-assistant?id=${agentId}`,
+      `${window.OPSMIND_API_URL}/api/delete-assistant?id=${agentId}`,
       {
         method: "DELETE",
         headers: {
@@ -55,7 +55,7 @@ async function loadCalls() {
   tbody.innerHTML = `<tr><td colspan="10" class="table-empty">Loading calls…</td></tr>`;
 
   try {
-    const res = await fetch(`http://localhost:8000/api/calls?assistant_id=${encodeURIComponent(agentId)}`);
+    const res = await fetch(`${window.OPSMIND_API_URL}/api/calls?assistant_id=${encodeURIComponent(agentId)}`);
     const data = await res.json();
 
     const calls = Array.isArray(data) ? data : (data.results || data.calls || []);
@@ -204,7 +204,7 @@ async function loadCharts() {
   if (!agentId) return;
 
   try {
-    const res = await fetch(`http://localhost:8000/api/calls?assistant_id=${encodeURIComponent(agentId)}`);
+    const res = await fetch(`${window.OPSMIND_API_URL}/api/calls?assistant_id=${encodeURIComponent(agentId)}`);
     const data = await res.json();
     const calls = Array.isArray(data) ? data : (data.results || data.calls || []);
 

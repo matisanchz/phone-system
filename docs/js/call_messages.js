@@ -22,7 +22,7 @@ async function refreshCall() {
   statsGrid.innerHTML = "";
 
   try {
-    const res = await fetch(`http://localhost:8000/api/call?id=${encodeURIComponent(callId)}`);
+    const res = await fetch(`${window.OPSMIND_API_URL}/api/call?id=${encodeURIComponent(callId)}`);
     const call = await res.json();
 
     if (!res.ok) {
