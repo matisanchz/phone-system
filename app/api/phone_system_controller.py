@@ -238,12 +238,10 @@ async def create_agent(
 
     logger.info(f"Before creating tool with files {vapi_file_ids}")
 
-    description = """Use this tool to retrieve factual information from official business documents uploaded by the user.
-    Only use this tool when the caller asks specific questions about written rules, policies, procedures, or requirements.
-    If the information is not explicitly stated in the documents, say that you do not have that information and do not guess."""
+    description = """Use this tool to retrieve factual information from official business documents HOAs uploaded by the user.
+Only use this tool when the caller asks specific questions about written rules, policies, restrictions, procedures, or requirements (For example: size of leaving units in a leasing, pool usage, etc). If the information is not explicitly stated in the documents, say that you do not have that information and do not guess."""
 
-    kb_description = """This knowledge base contains official business documents provided by the user, such as rules, policies, procedures, guidelines, or reference materials.
-    Use this knowledge base only to answer questions that require accurate and verifiable information from these documents."""
+    kb_description = """Contains comprehensive information about HOAs rules, regulations, prohibitions and other concerns about the property and leasing."""
 
     tool_id = create_vapi_query_tool(tool_description=description, kb_name="business_documents", kb_description=kb_description, file_ids=vapi_file_ids)
 
