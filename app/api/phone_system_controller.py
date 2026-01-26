@@ -10,6 +10,11 @@ from app.database import get_db
 from app.prompts.property_manager_prompt import property_manager_system_prompt, property_manager_first_message
 from sqlalchemy import text
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 load_dotenv()
 
 router = APIRouter()
@@ -53,7 +58,7 @@ def create_vapi_query_tool(
     if not file_ids:
         raise HTTPException(status_code=400, detail="file_ids must not be empty")
     
-    print("Creating query tool...")
+    logger.info("Creating query tool...")
 
     payload = {
         "type": "query",
@@ -101,7 +106,7 @@ def create_vapi_query_tool(
             json=payload,
             timeout=timeout_s
         )
-        print("Tool created...")
+        logger.info("Tool created...")
         resp.raise_for_status()
         data = resp.json()
     except requests.HTTPError as e:
@@ -237,12 +242,16 @@ async def create_agent(
         
         vapi_file_ids.append(vapi_file_id)
 
-        tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
+    logger.info(f"Before creating tool with files {vapi_file_ids}")
+
+    tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
+
+    logger.info(f"Tool created {tool_id}")
 
     if not vapi_file_ids:
         raise HTTPException(status_code=400, detail="All uploaded files were empty.")
     
-    print(f"VAPI Files added {vapi_file_ids}")
+    logger.info(f"VAPI Files added {vapi_file_ids}")
     
     payload = {
         "name": agent_name,
@@ -294,7 +303,7 @@ async def create_agent(
         row = result.mappings().one()
         db.commit()
     except Exception as e:
-        print(f"Exception: {e}")
+        logger.info(f"Exception: {e}")
 
     return response.json()
     
@@ -317,7 +326,7 @@ async def get_agents(
             results.append(resp.json())
 
         except Exception as e:
-            print(f"Exception: {e}")
+            logger.info(f"Exception: {e}")
 
     return results
 
@@ -338,7 +347,7 @@ async def get_phones(
             resp.raise_for_status()
             results.append(resp.json())
         except Exception as e:
-            print(f"Exception fetching phone {phone_id}: {e}")
+            logger.info(f"Exception fetching phone {phone_id}: {e}")
 
     return results
 
@@ -367,7 +376,7 @@ async def list_calls(
             params=params
         )
         calls.raise_for_status()
-        print(calls.json())
+        logger.info(calls.json())
         return calls.json()
 
     except Exception as e:
@@ -412,7 +421,7 @@ async def create_agent(
         # Implement mapping logic for different default system prompts. In this case, for demo purposes, we return propery manager prompt
         return property_manager_system_prompt.format(name=agent_name)
     except Exception as e:
-        print(f"Exception: {e}")
+        logger.info(f"Exception: {e}")
 
 @router.get("/first_message")
 async def create_agent(
@@ -424,7 +433,7 @@ async def create_agent(
         # Implement mapping logic for different default system prompts. In this case, for demo purposes, we return propery manager prompt
         return property_manager_first_message.format(name=agent_name)
     except Exception as e:
-        print(f"Exception: {e}")
+        logger.info(f"Exception: {e}")
 
 @router.post("/test-call")
 async def test_call(customer_number: str, assistant_id: str):
