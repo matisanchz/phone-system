@@ -199,21 +199,6 @@ def upload_text_to_vapi(text: str, base_filename: str, headers: dict) -> str:
     except KeyError:
         raise HTTPException(status_code=502, detail="Vapi file upload response missing 'id'")
 
-def upload_bytes_to_vapi(filename: str, content: bytes, mime: str, headers: dict) -> str:
-    try:
-        resp = requests.post(
-            VAPI_FILE_URL,
-            headers=headers,
-            files={"file": (filename, content, mime)},
-            timeout=60
-        )
-        resp.raise_for_status()
-        return resp.json()["id"]
-    except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"Vapi file upload failed: {str(e)}")
-    except KeyError:
-        raise HTTPException(status_code=502, detail="Vapi upload response missing 'id'")
-
 @router.post("/create-agent")
 async def create_agent(
     agent_name: str = Form(...),
@@ -254,10 +239,12 @@ async def create_agent(
         
         vapi_file_ids.append(vapi_file_id)
 
-        tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
+        #tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
 
     if not vapi_file_ids:
         raise HTTPException(status_code=400, detail="All uploaded files were empty.")
+    
+    print(f"VAPI Files added {vapi_file_ids}")
     
     payload = {
         "name": agent_name,
@@ -274,10 +261,11 @@ async def create_agent(
                     "role": "system",
                     "content": system_prompt
                 }
-            ],
-            "toolIds": [
-                tool_id
             ]
+            #,
+            #"toolIds": [
+            #    tool_id
+            #]
         },
         "voice": {
             "provider": "11labs",
