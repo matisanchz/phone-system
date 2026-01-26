@@ -157,9 +157,9 @@ def extract_text_from_asprise(ocr_json: dict) -> str:
     return "\n\n".join(pages_text)
 
 
-async def run_ocr(file_bytes: bytes, filename: str, content_type: str) -> str:
+def run_ocr(file_bytes: bytes, filename: str, content_type: str) -> str:
     try:
-        ocr_resp = await requests.post(
+        ocr_resp = requests.post(
             OCR_URL,
             data={
                 "api_key": "TEST",
@@ -222,13 +222,13 @@ async def create_agent(
 
         file_bytes = await f.read()
 
-        ocr_text = await run_ocr(
+        ocr_text = run_ocr(
             file_bytes=file_bytes,
             filename=f.filename or "upload",
             content_type=f.content_type or "application/pdf"
         )
 
-        vapi_file_id = await upload_text_to_vapi(
+        vapi_file_id = upload_text_to_vapi(
             text=ocr_text,
             base_filename=f.filename or "upload.pdf",
             headers=headers

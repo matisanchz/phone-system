@@ -38,18 +38,6 @@ document.getElementById("createAgentForm").addEventListener("submit", async (e) 
   const form = e.target;
   const formData = new FormData(form);
 
-  // Asegurar multi-file en caso de que el browser no lo agregue como esperás
-  const fileInput = document.getElementById("files");
-  if (fileInput && fileInput.files && fileInput.files.length > 0) {
-    // remove possible previous single "file" field if exists
-    formData.delete("file");
-
-    // re-append all
-    for (const f of fileInput.files) {
-      formData.append("files", f);
-    }
-  }
-
   try {
     const res = await fetch(`${window.OPSMIND_API_URL}/api/create-agent`, {
       method: "POST",
