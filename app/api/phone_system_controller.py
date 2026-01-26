@@ -66,18 +66,23 @@ def create_vapi_query_tool(
                 "required": []
             }
         },
+        "server": {
+            "url": None,
+            "credentialId": None,
+            "timeoutSeconds": 20
+        },
         "messages": [
             {
                 "type": "request-start",
-                "blocking": blocking
+                "blocking": False
             }
         ],
         "knowledgeBases": [
             {
                 "name": kb_name,
+                "description": kb_description,
                 "provider": provider,
                 "model": model,
-                "description": kb_description,
                 "fileIds": file_ids
             }
         ]
@@ -120,14 +125,7 @@ def create_vapi_query_tool(
             detail="Vapi response was not valid JSON"
         )
 
-    tool_id = data.get("id")
-    if not tool_id:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Vapi response missing tool id: {data}"
-        )
-
-    return tool_id
+    return data.get("id")
 
 def extract_text_from_asprise(ocr_json: dict) -> str:
     if not isinstance(ocr_json, dict):
@@ -239,7 +237,7 @@ async def create_agent(
         
         vapi_file_ids.append(vapi_file_id)
 
-        #tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
+        tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
 
     if not vapi_file_ids:
         raise HTTPException(status_code=400, detail="All uploaded files were empty.")
@@ -261,11 +259,10 @@ async def create_agent(
                     "role": "system",
                     "content": system_prompt
                 }
+            ],
+            "toolIds": [
+                tool_id
             ]
-            #,
-            #"toolIds": [
-            #    tool_id
-            #]
         },
         "voice": {
             "provider": "11labs",
