@@ -8,7 +8,6 @@ import requests
 from dotenv import load_dotenv
 from app.database import get_db
 from app.prompts.property_manager_prompt import property_manager_system_prompt, property_manager_first_message
-from app.schemas.create_agent_request import CreateAgentRequest
 from sqlalchemy import text
 
 load_dotenv()
@@ -253,7 +252,7 @@ async def create_agent(
         
         vapi_file_ids.append(vapi_file_id)
 
-        tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
+        #tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
 
     if not vapi_file_ids:
         raise HTTPException(status_code=400, detail="All uploaded files were empty.")
@@ -273,10 +272,11 @@ async def create_agent(
                     "role": "system",
                     "content": system_prompt
                 }
-            ],
-            "toolIds": [
-                tool_id
             ]
+            #,
+            #"toolIds": [
+            #    tool_id
+            #]
         },
         "voice": {
             "provider": "11labs",
