@@ -222,13 +222,13 @@ async def create_agent(
 
         file_bytes = await f.read()
 
-        ocr_text = run_ocr(
+        ocr_text = await run_ocr(
             file_bytes=file_bytes,
             filename=f.filename or "upload",
             content_type=f.content_type or "application/pdf"
         )
 
-        vapi_file_id = upload_text_to_vapi(
+        vapi_file_id = await upload_text_to_vapi(
             text=ocr_text,
             base_filename=f.filename or "upload.pdf",
             headers=headers
