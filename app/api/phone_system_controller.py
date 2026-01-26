@@ -40,7 +40,6 @@ TOOL_ID = os.environ.get("TOOL_ID")
 headers = {"Authorization": f"Bearer {VAPI_API_TOKEN}"}
 
 def create_vapi_query_tool(
-    *,
     tool_description: str,
     kb_name: str,
     kb_description: str,
@@ -158,9 +157,9 @@ def extract_text_from_asprise(ocr_json: dict) -> str:
     return "\n\n".join(pages_text)
 
 
-def run_ocr(file_bytes: bytes, filename: str, content_type: str) -> str:
+async def run_ocr(file_bytes: bytes, filename: str, content_type: str) -> str:
     try:
-        ocr_resp = requests.post(
+        ocr_resp = await requests.post(
             OCR_URL,
             data={
                 "api_key": "TEST",
@@ -217,6 +216,8 @@ async def create_agent(
 
     vapi_file_ids: List[str] = []
 
+    logger.info(f"Processing {len(files)} - {files}")
+
     for f in files:
 
         file_bytes = await f.read()
@@ -232,19 +233,19 @@ async def create_agent(
             base_filename=f.filename or "upload.pdf",
             headers=headers
         )
-
-        description = """Use this tool to retrieve factual information from official business documents uploaded by the user.
-            Only use this tool when the caller asks specific questions about written rules, policies, procedures, or requirements.
-            If the information is not explicitly stated in the documents, say that you do not have that information and do not guess."""
-
-        kb_description = """This knowledge base contains official business documents provided by the user, such as rules, policies, procedures, guidelines, or reference materials.
-            Use this knowledge base only to answer questions that require accurate and verifiable information from these documents."""
         
         vapi_file_ids.append(vapi_file_id)
 
     logger.info(f"Before creating tool with files {vapi_file_ids}")
 
-    tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
+    description = """Use this tool to retrieve factual information from official business documents uploaded by the user.
+    Only use this tool when the caller asks specific questions about written rules, policies, procedures, or requirements.
+    If the information is not explicitly stated in the documents, say that you do not have that information and do not guess."""
+
+    kb_description = """This knowledge base contains official business documents provided by the user, such as rules, policies, procedures, guidelines, or reference materials.
+    Use this knowledge base only to answer questions that require accurate and verifiable information from these documents."""
+
+    tool_id = create_vapi_query_tool(tool_description=description, kb_name="business_documents", kb_description=kb_description, file_ids=vapi_file_ids)
 
     logger.info(f"Tool created {tool_id}")
 
