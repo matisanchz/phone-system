@@ -52,6 +52,8 @@ def create_vapi_query_tool(
 
     if not file_ids:
         raise HTTPException(status_code=400, detail="file_ids must not be empty")
+    
+    print("Creating query tool...")
 
     payload = {
         "type": "query",
@@ -82,8 +84,7 @@ def create_vapi_query_tool(
     }
 
     headers = {
-        "Authorization": f"Bearer {VAPI_API_TOKEN}",
-        "Content-Type": "application/json"
+        "Authorization": f"Bearer {VAPI_API_TOKEN}"
     }
 
     url = f"{VAPI_BASE_URL}/tool"
@@ -95,6 +96,7 @@ def create_vapi_query_tool(
             json=payload,
             timeout=timeout_s
         )
+        print("Tool created...")
         resp.raise_for_status()
         data = resp.json()
     except requests.HTTPError as e:
