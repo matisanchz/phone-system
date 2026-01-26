@@ -2,7 +2,7 @@
 import datetime
 import json
 import os
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 import requests
 from dotenv import load_dotenv
@@ -14,6 +14,8 @@ from sqlalchemy import text
 load_dotenv()
 
 router = APIRouter()
+
+VAPI_BASE_URL = "https://api.vapi.ai"
 
 OCR_URL = "https://ocr.asprise.com/api/v1/receipt"
 
@@ -33,24 +35,123 @@ TOOL_ID = os.environ.get("TOOL_ID")
 
 headers = {"Authorization": f"Bearer {VAPI_API_TOKEN}"}
 
-def extract_text_from_asprise(ocr_json: dict) -> str:
+def create_vapi_query_tool(
+    *,
+    tool_description: str,
+    kb_name: str,
+    kb_description: str,
+    file_ids: List[str],
+    provider: str = "google",
+    model: str = "gemini-2.0-flash",
+    blocking: bool = False,
+    timeout_s: int = 30,
+) -> str:
+    """
+    Creates a Vapi Query Tool using one Knowledge Base with multiple fileIds.
+    Returns: tool_id
+    """
 
+    if not file_ids:
+        raise HTTPException(status_code=400, detail="file_ids must not be empty")
+
+    payload = {
+        "type": "query",
+        "function": {
+            "name": "query_tool",
+            "description": tool_description,
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        },
+        "messages": [
+            {
+                "type": "request-start",
+                "blocking": blocking
+            }
+        ],
+        "knowledgeBases": [
+            {
+                "name": kb_name,
+                "provider": provider,
+                "model": model,
+                "description": kb_description,
+                "fileIds": file_ids
+            }
+        ]
+    }
+
+    headers = {
+        "Authorization": f"Bearer {VAPI_API_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    url = f"{VAPI_BASE_URL}/tool"
+
+    try:
+        resp = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=timeout_s
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.HTTPError as e:
+        detail: Optional[str]
+        try:
+            detail = resp.text
+        except Exception:
+            detail = str(e)
+        raise HTTPException(
+            status_code=resp.status_code,
+            detail=f"Vapi error creating tool: {detail}"
+        )
+    except requests.RequestException as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Network error calling Vapi: {str(e)}"
+        )
+    except ValueError:
+        raise HTTPException(
+            status_code=502,
+            detail="Vapi response was not valid JSON"
+        )
+
+    tool_id = data.get("id")
+    if not tool_id:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Vapi response missing tool id: {data}"
+        )
+
+    return tool_id
+
+def extract_text_from_asprise(ocr_json: dict) -> str:
     if not isinstance(ocr_json, dict):
         return ""
 
     if ocr_json.get("success") is not True:
         return ""
 
-    receipts = ocr_json.get("receipts") or []
-    if isinstance(receipts, list) and receipts:
-        first = receipts[0] if isinstance(receipts[0], dict) else {}
+    receipts = ocr_json.get("receipts")
+    if not isinstance(receipts, list) or not receipts:
+        return ""
+
+    pages_text: list[str] = []
+
+    for receipt in receipts:
+        if not isinstance(receipt, dict):
+            continue
+
         for key in ("ocr_text", "text", "raw_text"):
-            val = first.get(key)
+            val = receipt.get(key)
             if isinstance(val, str) and val.strip():
-                return val.strip()
-    
-    dumped = json.dumps(ocr_json, ensure_ascii=False)
-    return dumped if dumped.strip() else ""
+                pages_text.append(val.strip())
+                break
+
+    return "\n\n".join(pages_text)
 
 
 def run_ocr(file_bytes: bytes, filename: str, content_type: str) -> str:
@@ -143,7 +244,16 @@ async def create_agent(
             headers=headers
         )
 
+        description = """Use this tool to retrieve factual information from official business documents uploaded by the user.
+            Only use this tool when the caller asks specific questions about written rules, policies, procedures, or requirements.
+            If the information is not explicitly stated in the documents, say that you do not have that information and do not guess."""
+
+        kb_description = """This knowledge base contains official business documents provided by the user, such as rules, policies, procedures, guidelines, or reference materials.
+            Use this knowledge base only to answer questions that require accurate and verifiable information from these documents."""
+        
         vapi_file_ids.append(vapi_file_id)
+
+        tool_id = create_vapi_query_tool(description, "business_documents", kb_description, vapi_file_ids)
 
     if not vapi_file_ids:
         raise HTTPException(status_code=400, detail="All uploaded files were empty.")
@@ -163,6 +273,9 @@ async def create_agent(
                     "role": "system",
                     "content": system_prompt
                 }
+            ],
+            "toolIds": [
+                tool_id
             ]
         },
         "voice": {
